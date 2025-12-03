@@ -10,11 +10,7 @@ import com.example.test_lab_week_12.model.Movie
 import com.example.test_lab_week_12.viewmodel.MovieViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.collect
 import androidx.lifecycle.repeatOnLifecycle
-import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
@@ -40,7 +36,8 @@ class MainActivity : AppCompatActivity() {
         val movieRepository = (application as MovieApplication).movieRepository
 
         val movieViewModel = ViewModelProvider(
-            this, object : ViewModelProvider.Factory {
+            this,
+            object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return MovieViewModel(movieRepository) as T
                 }
@@ -50,16 +47,10 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
 
+                // 🔥 Activity tidak filtering lagi
                 launch {
-                    movieViewModel.popularMovies.collect { movieList ->
-                        val currentYear =
-                            Calendar.getInstance().get(Calendar.YEAR).toString()
-
-                        movieAdapter.addMovies(
-                            movieList
-                                .filter { it.releaseDate?.startsWith(currentYear) == true }
-                                .sortedByDescending { it.popularity }
-                        )
+                    movieViewModel.popularMovies.collect { movies ->
+                        movieAdapter.addMovies(movies)
                     }
                 }
 
